@@ -1,5 +1,5 @@
 CC = gcc
-TARGET = visualizer
+TARGET = prism
 
 RAYLIB  ?= ./libs/raylib/src/
 LIBI = -I./cfft/include/
