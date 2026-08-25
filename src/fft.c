@@ -39,22 +39,35 @@ void compute_bar_bins(float* bar_start_bin, size_t num_bars, fft_cfg* cfg)
 
 void fill_bars(float* mags, float* bars, size_t num_bars, float* bar_start_bin, fft_cfg* cfg)
 {
-    for (int i = 0; i < num_bars; i++) 
+    int max_bin = (int)(cfg->sample_size / 2);
+
+    for (int i = 0; i < num_bars; i++)
     {
-        int start = (int)bar_start_bin[i];
-        int end   = (int)bar_start_bin[i + 1];
+        float start_f = bar_start_bin[i];
+        float end_f   = bar_start_bin[i + 1];
 
-        if (end <= start) end = start + 1;          
-        end = end > cfg->sample_size / 2 ? cfg->sample_size / 2 : end;  
-
-        float max = 0.0f;
-
-        for (int j = start; j < end; j++) 
+        if (end_f - start_f < 1.0f)
         {
-            max = mags[j] > max ? mags[j]: max;
-        }
+            int lo = (int)start_f;
+            int hi = lo + 1;
+            if (hi > max_bin) hi = max_bin;
+            if (lo > max_bin) lo = max_bin;
 
-        bars[i] = max;
+            float frac = start_f - (float)lo;
+            bars[i] = mags[lo] * (1.0f - frac) + mags[hi] * frac;
+        }
+        else
+        {
+            int start = (int)start_f;
+            int end   = (int)end_f;
+            end = end > max_bin ? max_bin : end;
+
+            float total = 0.0f;
+            int size = end - start;
+            for (int j = start; j < end; j++)
+                total += mags[j];
+
+            bars[i] = total / (float)size;
+        }
     }
 }
-

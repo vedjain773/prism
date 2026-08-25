@@ -26,9 +26,9 @@ void fill_ray_rects(Rectangle* rects, float* bars, size_t num_bars, render_cfg* 
     for (size_t i = 0; i < num_bars; i++)
     {
         rects[i].x = start;
-        rects[i].y = 0;
+        rects[i].y = cfg->height - bars[i] * cfg->height;
         rects[i].width = width;
-        rects[i].height = bars[i] * (cfg->height - 20);
+        rects[i].height = bars[i] * cfg->height;
 
         start += gap + width;
     }
